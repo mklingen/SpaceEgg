@@ -50,7 +50,7 @@ public:
 		UCurveFloat* MovementCurve;
 	
 	UFUNCTION(BlueprintCallable)
-	TEnumAsByte<SimpleAnimationState> GetState() const {
+	TEnumAsByte<SimpleAnimationState> GetAnimationState() const {
 		return state;
 	}
 

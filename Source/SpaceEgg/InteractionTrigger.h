@@ -26,4 +26,8 @@ public:
 		void OnInteraction();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interaction")
 		void OnCursorOver();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interaction")
+		bool IsInteractable();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interaction")
+	void SetInteractable(bool interactable);
 };

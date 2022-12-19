@@ -13,7 +13,7 @@ public:
 
 	UActorHelpers() = default;
 
-	static void DoRecursive(AActor* root, std::function<void(AActor*)> callback);
+	static void DoRecursive(AActor* root, std::function<void(AActor*)>& callback);
 	
 	template <typename TActorType>
 	static TActorType* FindChildRecursive(const AActor* root)
@@ -29,6 +29,29 @@ public:
 			}
 		}
 		return nullptr;
+	}
+
+	// Creates an actor of the given type and attaches it to the root actor with the given relative location and rotation.
+	// Returns nullptr if no such actor could be created.
+	template <typename TActorType>
+	static TActorType* CreateAndAttach(TSubclassOf<AActor> actorClass, AActor* root, const FVector& relativeLocation, const FRotator& relativeRotation)
+	{
+		// Check for nullptr input parameters
+		if (!actorClass || !root)
+		{
+			return nullptr;
+		}
+
+
+		FVector worldLocation = root->GetActorTransform().TransformPosition(relativeLocation);
+		FRotator worldRotation = FRotator(root->GetActorTransform().TransformRotation(relativeRotation.Quaternion()));
+		TActorType* childActor = Cast<TActorType>(root->GetWorld()->SpawnActor(actorClass, &worldLocation, &worldRotation));
+		if (!childActor)
+		{
+			return nullptr;
+		}
+		childActor->AttachToActor(root, FAttachmentTransformRules::KeepWorldTransform);
+		return childActor;
 	}
 
 	// Converts an object to a type of TScriptInterface, assuming it implements that interface.
@@ -71,6 +94,8 @@ public:
 		return nullptr;
 	}
 
+#define GET_INTERFACE(InterfaceType, root) UActorHelpers::FindActorOrComponentInterface<I##InterfaceType>(U##InterfaceType::StaticClass(), root)
+
 	// Returns all the interfaces including the root and all components/actors that are below the root.
 	template <typename TInterfaceType>
 	static void FindActorOrComponentInterfacesRecursive(TSubclassOf<UInterface> interfaceClass, AActor* root, TArray<TScriptInterface<TInterfaceType>>& interfaces)
@@ -92,6 +117,17 @@ public:
 		}
 	}
 
+	template <typename TInterfaceType>
+	static TArray<TScriptInterface<TInterfaceType>> FindActorOrComponentInterfacesRecursive(TSubclassOf<UInterface> interfaceClass, AActor* root) 
+	{
+		TArray<TScriptInterface<TInterfaceType>> a;
+		FindActorOrComponentInterfacesRecursive(interfaceClass, root, a);
+		return a;
+	}
+
+#define GET_INTERFACES_RECURSIVE(InterfaceType, root) UActorHelpers::FindActorOrComponentInterfacesRecursive<I##InterfaceType>(U##InterfaceType::StaticClass(), root)
+
+
 	template <typename TActorType>
 	static TArray<TActorType*> FindChildrenRecursive(const AActor* root)
 	{
@@ -112,7 +148,7 @@ public:
 	template <typename TComponent>
 	static TComponent* FindComponentRecursive(const AActor* root)
 	{
-		TComponent* rootComponent = FindComponentOfClass<TComponent>(root);
+		TComponent* rootComponent = root->FindComponentByClass<TComponent>();
 		if (rootComponent)
 		{
 			return rootComponent;
@@ -121,7 +157,7 @@ public:
 		root->GetAttachedActors(children, true, true);
 		for (const AActor* child : children)
 		{
-			TComponent* childComponent = FindComponentByClass<TComponent>(child);
+			TComponent* childComponent = child->FindComponentByClass<TComponent>();
 			if (childComponent)
 			{
 				return childComponent;
@@ -154,4 +190,5 @@ public:
 
 	static double DistanceToActor(const AActor* actor, const FVector& point, ECollisionChannel channels, FVector& pointsOut);
 
+	static AActor* GetRootActor(AActor* child);
 };

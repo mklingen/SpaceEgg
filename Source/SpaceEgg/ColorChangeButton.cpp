@@ -6,10 +6,10 @@
 // Sets default values
 AColorChangeButton::AColorChangeButton()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	colorChanger = CreateDefaultSubobject<UColorChangerComponent>(TEXT("Color Changer"));
 }
 
 // Called when the game starts or when spawned
@@ -19,32 +19,40 @@ void AColorChangeButton::BeginPlay()
 	FScriptDelegate d;
 	d.BindUFunction(this, TEXT("Toggle"));
 	OnInteract.Add(d);
-	SetState(state);
+	SetButtonState(state);
 }
 
 void AColorChangeButton::Toggle()
 {
 	if (state == ButtonState::Off)
 	{
-		SetState(ButtonState::On);
+		SetButtonState(ButtonState::On);
 	}
 	else
 	{
-		SetState(ButtonState::Off);
+		SetButtonState(ButtonState::Off);
 	}
 }
 
 
 
-void AColorChangeButton::SetState(TEnumAsByte<ButtonState> buttonState)
+void AColorChangeButton::SetButtonState(TEnumAsByte<ButtonState> buttonState)
 {
 	state = buttonState;
-	if (state == ButtonState::Off && OffMaterial)
+	if (colorChanger) 
 	{
-		mesh->SetMaterial(MaterialIndex, OffMaterial);
+		colorChanger->SetState_Implementation(static_cast<int>(state));
 	}
-	else if (state == ButtonState::On && OnMaterial)
+}
+
+int AColorChangeButton::GetState_Implementation() const 
+{
+	return colorChanger ? colorChanger->GetState_Implementation() : 0;
+}
+void AColorChangeButton::SetState_Implementation(int value) 
+{
+	if (colorChanger)
 	{
-		mesh->SetMaterial(MaterialIndex, OnMaterial);
+		colorChanger->SetState_Implementation(value);
 	}
 }

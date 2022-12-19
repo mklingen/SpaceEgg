@@ -3,6 +3,9 @@
 
 #include "SimpleAnimateonInteract.h"
 
+#include "Helpers/ActorHelpers.h"
+#include "Toggleable.h"
+
 // Sets default values for this component's properties
 USimpleAnimateonInteract::USimpleAnimateonInteract()
 {
@@ -28,17 +31,15 @@ void USimpleAnimateonInteract::BeginPlay()
 void USimpleAnimateonInteract::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void USimpleAnimateonInteract::OnInteraction_Implementation()
 {
-	if (state == SimpleAnimationState::StoppedAtA)
+	if (state == SimpleAnimationState::StoppedAtA || state == SimpleAnimationState::MovingFromBToA)
 	{
 		Animate(true, AnimationTime);
 	}
-	else if (state == SimpleAnimationState::StoppedAtB)
+	else if (state == SimpleAnimationState::StoppedAtB || state == SimpleAnimationState::MovingFromAToB)
 	{
 		Animate(false, AnimationTime);
 	}

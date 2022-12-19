@@ -22,9 +22,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+		bool isInteractable = true;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void OnInteraction_Implementation() override;
+	virtual bool IsInteractable_Implementation() override { return isInteractable; }
+	virtual void SetInteractable_Implementation(bool value) override { isInteractable = value; }
+
 };

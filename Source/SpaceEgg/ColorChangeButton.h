@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "InteractiveObject.h"
 #include "Components/StaticMeshComponent.h"
+#include "ColorChangerComponent.h"
+#include "Toggleable.h"
 #include "ColorChangeButton.generated.h"
 
 UENUM()
@@ -13,10 +15,11 @@ enum ButtonState
 {
 	Off     UMETA(DisplayName = "Off"),
 	On      UMETA(DisplayName = "On"),
+	On2 UMETA(DisplayName = "On2")
 };
 
 UCLASS()
-class SPACEEGG_API AColorChangeButton : public AInteractiveObject
+class SPACEEGG_API AColorChangeButton : public AInteractiveObject, public IToggleable
 {
 	GENERATED_BODY()
 	
@@ -36,19 +39,16 @@ protected:
 
 public:	
 
-		
+
+	virtual int GetState_Implementation() const override;
+	virtual void SetState_Implementation(int value) override;
+
 	UFUNCTION(BlueprintCallable)
 		void Toggle();
 
 	UFUNCTION(BlueprintCallable)
-		void SetState(TEnumAsByte<ButtonState> buttonState);
+		void SetButtonState(TEnumAsByte<ButtonState> buttonState);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Color Change")
-		int MaterialIndex = 0;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Color Change")
-		UMaterialInterface* OffMaterial = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Color Change")
-		UMaterialInterface* OnMaterial = nullptr;
+		UColorChangerComponent* colorChanger = nullptr;
 };

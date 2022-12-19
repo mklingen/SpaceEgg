@@ -36,6 +36,8 @@ public:
 		TScriptInterface<IInteractionTrigger> GetObjectUnderCursorOrNull();
 
 	UFUNCTION()
+		TScriptInterface<IInteractionTrigger> SphereSweepOrNull(float radius, const FVector& start, const FVector& end);
+	UFUNCTION()
 		bool Trigger();
 
 

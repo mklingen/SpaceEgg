@@ -2,12 +2,12 @@
 
 #include "Components/ShapeComponent.h"
 
-void UActorHelpers::DoRecursive(AActor* root, std::function<void(AActor*)> callback)
+void UActorHelpers::DoRecursive(AActor* root, std::function<void(AActor*)>& callback)
 {
 	callback(root);
 	TArray<AActor*> children;
 	// This is already recursive!
-	root->GetAttachedActors(children, true, true);
+	root->GetAttachedActors(children, true /* reset the array. */, true /* recursively find the attached actors.*/);
 	for (AActor* child : children)
 	{
 		callback(child);
@@ -52,4 +52,13 @@ double UActorHelpers::DistanceToActor(const AActor* actor, const FVector& point,
 	return minDist;
 
 
+}
+
+AActor* UActorHelpers::GetRootActor(AActor* child)
+{
+	if (child->GetParentActor())
+	{
+		return GetRootActor(child->GetParentActor());
+	}
+	return child;
 }

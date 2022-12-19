@@ -38,6 +38,46 @@ void UTriggerInteractionsComponent::TickComponent(float DeltaTime, ELevelTick Ti
 
 }
 
+
+TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::SphereSweepOrNull(float radius, const FVector& start, const FVector& end)
+{
+	FHitResult hit;
+	if (UKismetSystemLibrary::SphereTraceSingle(this, start, end, radius, UEngineTypes::ConvertToTraceType(CollisionTraceChannel), false, TArray<AActor*>(), EnableDebugDraw ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, hit, true, FLinearColor::Red, FLinearColor::Green, 0.1f))
+	{
+		auto actor = hit.GetActor();
+		if (actor)
+		{
+			if (EnableDebugDraw)
+			{
+				DRAW_STRING("%s", hit.ImpactPoint, FColor::Red, 0.1f, true, *(actor->GetActorNameOrLabel()));
+			}
+			TArray<TScriptInterface<IInteractionTrigger>> interfaces;
+			UActorHelpers::FindActorOrComponentInterfacesRecursive<IInteractionTrigger>(UInteractionTrigger::StaticClass(), actor, interfaces);
+			if (interfaces.IsEmpty())
+			{
+				if (EnableDebugDraw)
+				{
+					DrawDebugLine(GetWorld(), start, hit.Location, FColor::Red, false, 0.1f);
+				}
+				return false;
+			}
+			for (TScriptInterface<IInteractionTrigger> obj : interfaces)
+			{
+				if (IInteractionTrigger::Execute_IsInteractable(obj.GetObject()))
+				{
+					return obj;
+				}
+			}
+			if (EnableDebugDraw)
+			{
+				DrawDebugLine(GetWorld(), start, hit.Location, FColor::Green, false, 0.1f);
+			}
+			return nullptr;
+		}
+	}
+	return nullptr;
+}
+
 TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::GetObjectUnderCursorOrNull()
 {
 	FVector loc;
@@ -48,40 +88,16 @@ TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::GetObjectUn
 		return nullptr;
 	}
 	cameraManager->GetCameraViewPoint(loc, rot);
+
 	FHitResult hit;
 	FVector start = loc;
 	FVector end = loc + rot.RotateVector(FVector3d::ForwardVector) * MaxRange;
-	if (UKismetSystemLibrary::SphereTraceSingle(this, start, end, InteractSize, UEngineTypes::ConvertToTraceType(CollisionTraceChannel), false, TArray<AActor*>(), EnableDebugDraw ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, hit, true))
+	auto little_sweep = SphereSweepOrNull(10, start, end);
+	if (little_sweep)
 	{
-		auto actor = hit.GetActor();
-		if (actor)
-		{
-			if (EnableDebugDraw)
-			{
-				DRAW_STRING("%s", hit.ImpactPoint, FColor::Red, 1.0f, true, *(actor->GetActorNameOrLabel()));
-			}
-			TArray<TScriptInterface<IInteractionTrigger>> interfaces;
-			UActorHelpers::FindActorOrComponentInterfacesRecursive<IInteractionTrigger>(UInteractionTrigger::StaticClass(), actor, interfaces);
-			if (interfaces.IsEmpty())
-			{
-				if (EnableDebugDraw)
-				{
-					DrawDebugLine(GetWorld(), loc, hit.Location, FColor::Red, false, 1.0f);
-				}
-				return false;
-			}
-			for (TScriptInterface<IInteractionTrigger> obj : interfaces)
-			{
-				return obj;
-			}
-			if (EnableDebugDraw)
-			{
-				DrawDebugLine(GetWorld(), loc, hit.Location, FColor::Green, false, 1.0f);
-			}
-			return nullptr;
-		}
+		return little_sweep;
 	}
-	return nullptr;
+	return SphereSweepOrNull(InteractSize, start, end);
 }
 
 bool UTriggerInteractionsComponent::Trigger()
@@ -92,6 +108,7 @@ bool UTriggerInteractionsComponent::Trigger()
 		return false;
 	}
 	IInteractionTrigger::Execute_OnInteraction(obj.GetObject());
+	LOGI("Interacting with %s", *(obj.GetObject()->GetName()));
 	return true;
 }
 

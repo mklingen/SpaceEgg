@@ -3,6 +3,8 @@
 #include "SpaceEggProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "HealthComponent.h"
+#include "CauseDamageOnHitComponent.h"
 
 ASpaceEggProjectile::ASpaceEggProjectile() 
 {
@@ -29,6 +31,9 @@ ASpaceEggProjectile::ASpaceEggProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
+	Damage = CreateDefaultSubobject<UCauseDamageOnHitComponent>(TEXT("Damage"));
+	Health = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 }
 
 void ASpaceEggProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -36,8 +41,6 @@ void ASpaceEggProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
-		Destroy();
+		OtherComp->AddImpulseAtLocation(GetVelocity() * HitForce, GetActorLocation());
 	}
 }
