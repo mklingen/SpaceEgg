@@ -12,6 +12,19 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
+#include "SpaceEgg/Helpers/ActorHelpers.h"
+
+namespace
+{
+	void SetOutlinesRecursive(AActor* actor, bool turnOn)
+	{
+		TArray<UPrimitiveComponent*> primitives = UActorHelpers::FindComponentsRecursive<UPrimitiveComponent>(actor);
+		for (UPrimitiveComponent* primitive : primitives)
+		{
+			primitive->SetRenderCustomDepth(turnOn);
+		}
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 // ASpaceEggCharacter
@@ -185,7 +198,9 @@ void ASpaceEggCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (reticle)
 	{
-		bool underMouse = ObjectInteraction->GetObjectUnderCursorOrNull() != nullptr;
+		AActor* actorHit = nullptr;
+		auto underMouse = ObjectInteraction->GetObjectUnderCursorOrNull(actorHit);
+
 		if (underMouse)
 		{
 			FSlateBrush brush = reticle->Background;
@@ -197,6 +212,20 @@ void ASpaceEggCharacter::Tick(float DeltaTime)
 			FSlateBrush brush = reticle->Background;
 			brush.OutlineSettings.Color = FLinearColor(1, 1, 1, 0.3f);
 			reticle->SetBrush(brush);
+		}
+		if (actorHit != HighlightedActor)
+		{
+			if (HighlightedActor)
+			{
+				SetOutlinesRecursive(HighlightedActor, false);
+			}
+
+			HighlightedActor = actorHit;
+			
+			if (HighlightedActor)
+			{
+				SetOutlinesRecursive(HighlightedActor, true);
+			}
 		}
 	}
 }

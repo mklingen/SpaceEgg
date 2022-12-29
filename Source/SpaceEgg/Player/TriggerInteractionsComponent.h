@@ -33,10 +33,10 @@ public:
 		TEnumAsByte<ECollisionChannel> CollisionTraceChannel = ECollisionChannel::ECC_Visibility;
 	
 	UFUNCTION()
-		TScriptInterface<IInteractionTrigger> GetObjectUnderCursorOrNull();
+		TScriptInterface<IInteractionTrigger> GetObjectUnderCursorOrNull(AActor*& actorHit);
 
 	UFUNCTION()
-		TScriptInterface<IInteractionTrigger> SphereSweepOrNull(float radius, const FVector& start, const FVector& end);
+		TScriptInterface<IInteractionTrigger> SphereSweepOrNull(float radius, const FVector& start, const FVector& end, AActor*& actorHit);
 	UFUNCTION()
 		bool Trigger();
 

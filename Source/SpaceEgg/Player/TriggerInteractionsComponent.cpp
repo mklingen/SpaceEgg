@@ -10,6 +10,7 @@
 #include "SpaceEgg/Helpers/DebugDrawHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+
 // Sets default values for this component's properties
 UTriggerInteractionsComponent::UTriggerInteractionsComponent()
 {
@@ -39,7 +40,7 @@ void UTriggerInteractionsComponent::TickComponent(float DeltaTime, ELevelTick Ti
 }
 
 
-TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::SphereSweepOrNull(float radius, const FVector& start, const FVector& end)
+TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::SphereSweepOrNull(float radius, const FVector& start, const FVector& end, AActor*& actorHit)
 {
 	FHitResult hit;
 	if (UKismetSystemLibrary::SphereTraceSingle(this, start, end, radius, UEngineTypes::ConvertToTraceType(CollisionTraceChannel), false, TArray<AActor*>(), EnableDebugDraw ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, hit, true, FLinearColor::Red, FLinearColor::Green, 0.1f))
@@ -65,6 +66,7 @@ TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::SphereSweep
 			{
 				if (IInteractionTrigger::Execute_IsInteractable(obj.GetObject()))
 				{
+					actorHit = actor;
 					return obj;
 				}
 			}
@@ -78,7 +80,7 @@ TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::SphereSweep
 	return nullptr;
 }
 
-TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::GetObjectUnderCursorOrNull()
+TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::GetObjectUnderCursorOrNull(AActor*& actorHit)
 {
 	FVector loc;
 	FRotator rot;
@@ -92,17 +94,19 @@ TScriptInterface<IInteractionTrigger> UTriggerInteractionsComponent::GetObjectUn
 	FHitResult hit;
 	FVector start = loc;
 	FVector end = loc + rot.RotateVector(FVector3d::ForwardVector) * MaxRange;
-	auto little_sweep = SphereSweepOrNull(10, start, end);
+	auto little_sweep = SphereSweepOrNull(10, start, end, actorHit);
 	if (little_sweep)
 	{
 		return little_sweep;
 	}
-	return SphereSweepOrNull(InteractSize, start, end);
+	actorHit = nullptr;
+	return SphereSweepOrNull(InteractSize, start, end, actorHit);
 }
 
 bool UTriggerInteractionsComponent::Trigger()
 {
-	auto obj = GetObjectUnderCursorOrNull();
+	AActor* hit = nullptr;
+	auto obj = GetObjectUnderCursorOrNull(hit);
 	if (!obj)
 	{
 		return false;
