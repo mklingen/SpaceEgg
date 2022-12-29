@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "SpaceEggGameMode.h"
-#include "SpaceEggCharacter.h"
+#include "SpaceEgg/Player/SpaceEggCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ASpaceEggGameMode::ASpaceEggGameMode()
