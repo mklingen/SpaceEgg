@@ -38,9 +38,18 @@ public:
 		UBehaviorTree* BehaviorTreeAsset = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BT")
-		UBehaviorTreeComponent* BehaviorTree = nullptr;
+		UBehaviorTreeComponent* BehaviorTreeComponent = nullptr;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BT")
+		UBlackboardComponent* BlackboardComponent = nullptr;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BT")
 		UBlackboardData* BlackboardAsset = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BT")
+		FName PlayerKey = "Player";
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BT")
+		FName NPCKey = "NPC";
 };

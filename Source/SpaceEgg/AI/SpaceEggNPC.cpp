@@ -7,6 +7,8 @@
 #include "SpaceEgg/Components/DeathSFXComponent.h"
 #include "SpaceEgg/Components/HealthComponent.h"
 #include "SpaceEgg/AI/NPCAttackComponent.h"
+#include "SpaceEgg/Player/SpaceEggCharacter.h"
+#include "Perception/PawnSensingComponent.h"
 
 ASpaceEggNPC::ASpaceEggNPC()
 {
@@ -15,12 +17,39 @@ ASpaceEggNPC::ASpaceEggNPC()
 	Attack = CreateDefaultSubobject<UNPCAttackComponent>(TEXT("Attack"));
 	DamageSFX = CreateDefaultSubobject<UDamageSFXComponent>(TEXT("Damage sfx"));
 	DeathSFX = CreateDefaultSubobject<UDeathSFXComponent>(TEXT("Death sfx"));
+	Sensor = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("Sensor"));
+}
+
+void ASpaceEggNPC::OnSeePawn(APawn* pawn)
+{
+	LastSeenPawn = pawn;
+	ASpaceEggCharacter* player = Cast<ASpaceEggCharacter>(pawn);
+	if (player)
+	{
+		LastSeenPlayer = player;
+	}
 }
 
 void ASpaceEggNPC::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (Sensor)
+	{
+		Sensor->OnSeePawn.AddDynamic(this, &ASpaceEggNPC::OnSeePawn);
+	}
+}
+
+bool ASpaceEggNPC::CanSeeCharacter() const
+{
+	if (!LastSeenPlayer)
+	{
+		return false;
+	}
+	if (!Sensor)
+	{
+		return false;
+	}
+	return Sensor->CouldSeePawn(LastSeenPlayer);
 }
 
 void ASpaceEggNPC::Tick(float DeltaTime)
@@ -33,5 +62,15 @@ void ASpaceEggNPC::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+APawn* ASpaceEggNPC::GetLastSeenPawn() const
+{
+	return LastSeenPawn;
+}
+
+ASpaceEggCharacter* ASpaceEggNPC::GetLastSeenCharacter() const
+{
+	return LastSeenPlayer;
 }
 

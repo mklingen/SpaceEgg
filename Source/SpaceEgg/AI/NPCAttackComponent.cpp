@@ -96,6 +96,7 @@ bool UNPCAttackComponent::DoAttack(const FString& attackName, AActor* other)
 			continue;
 		}
 		attack.LastAttackTime = GetWorld()->GetTimeSeconds();
+		TimeOfLastAttack = attack.LastAttackTime;
 		UHealthComponent* health = other->FindComponentByClass<UHealthComponent>();
 		if (health && attack.MeleeDamage > 0)
 		{
@@ -123,6 +124,7 @@ bool UNPCAttackComponent::DoAttack(const FString& attackName, AActor* other)
 				FVector vel = projectile->GetProjectileMovement()->Velocity;
 				vel.Normalize();
 				vel *= FMath::FRandRange(attack.MinProjectileSpeed, attack.MaxProjectileSpeed);
+				vel += FVector::UpVector * attack.ProjectileArcSpeed;
 				projectile->GetProjectileMovement()->Velocity = vel;
 			}
 		}
@@ -131,3 +133,8 @@ bool UNPCAttackComponent::DoAttack(const FString& attackName, AActor* other)
 	return true;
 }
 
+bool UNPCAttackComponent::DidAttackRecently(float timeThreshold) const
+{
+	float time = GetWorld()->GetTimeSeconds();
+	return time - TimeOfLastAttack < timeThreshold;
+}

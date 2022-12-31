@@ -56,5 +56,18 @@ void UCauseDamageOnHitComponent::OnHit(UPrimitiveComponent* HitComponent, AActor
 			health->TakeDamage(Hit, GetOwner(), health->GetHealth(), nullptr, nullptr, GetOwner());
 		}
 	}
+	else if (ZeroOwnHealthIfHitAnything)
+	{
+		UHealthComponent* health = UActorHelpers::FindComponentRecursive<UHealthComponent>(GetOwner());
+		if (!health)
+		{
+			LOGW("Damage causer had no health, but ZeroOwnHealthOnHit set to true. Just destroying.");
+			GetOwner()->Destroy();
+		}
+		else
+		{
+			health->TakeDamage(Hit, GetOwner(), health->GetHealth(), nullptr, nullptr, GetOwner());
+		}
+	}
 }
 

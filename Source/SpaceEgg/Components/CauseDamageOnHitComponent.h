@@ -31,6 +31,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UDamageType* DamageType = nullptr;
 
+	// If true, the actor will be destroyed even if it doesn't cause damage to another actor.
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool ZeroOwnHealthIfHitAnything = false;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

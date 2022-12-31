@@ -30,6 +30,10 @@
 				"Mac",
 				"Linux"
 			]
+		},
+		{
+			"Name": "AlembicHairImporter",
+			"Enabled": true
 		}
 	]
 }

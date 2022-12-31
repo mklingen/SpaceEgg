@@ -39,6 +39,19 @@ void UHealthComponent::BeginPlay()
 		callbackDelegate.BindUFunction(deathCallback.GetObject(), TEXT("OnDied"));
 		OnDeath.Add(callbackDelegate);
 	}
+
+	GetOwner()->OnDestroyed.AddDynamic(this, &UHealthComponent::OnOwnerDestroyed);
+}
+
+void UHealthComponent::OnOwnerDestroyed(AActor* owner)
+{
+	if (Health <= 0 || !owner)
+	{
+		return;
+	}
+	FHitResult hitResult;
+	hitResult.Location = owner->GetActorLocation();
+	TakeDamage(hitResult, owner, Health + 1, nullptr, nullptr, owner);
 }
 
 void UHealthComponent::TakeDamage(const FHitResult& hitResult, AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigateBy, AActor* DamageCauser)

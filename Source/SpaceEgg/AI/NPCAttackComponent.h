@@ -40,6 +40,9 @@ struct FAttack
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		UAnimMontage* AttackAnimation;
 
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		float ProjectileArcSpeed = 0.0f;
+
 	UPROPERTY()
 		float LastAttackTime = -1.0f;
 };
@@ -57,6 +60,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	float TimeOfLastAttack = -1.0f;
+
 public:	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Attack)
 	TArray<FAttack> Attacks;
@@ -73,4 +78,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool DoAttack(const FString& attackName, AActor* other);
+
+	UFUNCTION(BlueprintCallable)
+		bool DidAttackRecently(float timeThreshold) const;
 };

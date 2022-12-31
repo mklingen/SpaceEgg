@@ -3,14 +3,16 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "SpaceEgg/Helpers/PrintHelper.h"
+#include "SpaceEgg/Player/SpaceEggCharacter.h"
+
 // Sets default values
 ASpaceEggNPCAIController::ASpaceEggNPCAIController()
 {
 	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BehaviorTree = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behavior tree"));
-	Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
+	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behavior tree"));
+	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
 }
 
 // Called when the game starts or when spawned
@@ -30,13 +32,13 @@ void ASpaceEggNPCAIController::OnPossess(class APawn* InPawn)
 	}
 	else
 	{
-		if (Blackboard && BlackboardAsset)
+		if (BlackboardComponent && BlackboardAsset)
 		{
-			Blackboard->InitializeBlackboard(*BlackboardAsset);
+			BlackboardComponent->InitializeBlackboard(*BlackboardAsset);
 		}
-		if (BehaviorTree && BehaviorTreeAsset)
+		if (BehaviorTreeComponent && BehaviorTreeAsset)
 		{
-			BehaviorTree->StartTree(*BehaviorTreeAsset);
+			BehaviorTreeComponent->StartTree(*BehaviorTreeAsset);
 		}
 	}
 }
@@ -45,9 +47,9 @@ void ASpaceEggNPCAIController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	if (BehaviorTree)
+	if (BehaviorTreeComponent)
 	{
-		BehaviorTree->StopTree();
+		BehaviorTreeComponent->StopTree();
 	}
 }
 
@@ -55,6 +57,17 @@ void ASpaceEggNPCAIController::OnUnPossess()
 void ASpaceEggNPCAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (npc && BehaviorTreeComponent && BlackboardComponent)
+	{
+
+		BlackboardComponent->SetValueAsObject(NPCKey, npc);
+
+		if (npc->GetLastSeenCharacter())
+		{
+			BlackboardComponent->SetValueAsObject(PlayerKey, npc->GetLastSeenCharacter());
+		}
+	}
 }
 
 ASpaceEggNPC* ASpaceEggNPCAIController::GetNPC() const

@@ -10,6 +10,8 @@ class UHealthComponent;
 class UNPCAttackComponent;
 class UDeathSFXComponent;
 class UDamageSFXComponent;
+class UPawnSensingComponent;
+class ASpaceEggCharacter;
 
 UCLASS()
 class SPACEEGG_API ASpaceEggNPC : public ACharacter
@@ -30,6 +32,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		UNPCAttackComponent* Attack = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+		UPawnSensingComponent* Sensor = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
 		UDamageSFXComponent* DamageSFX = nullptr;
@@ -37,7 +41,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SFX")
 		UDeathSFXComponent* DeathSFX = nullptr;
 
+	UFUNCTION()
+		void OnSeePawn(APawn* pawn);
+
+	UPROPERTY()
+		APawn* LastSeenPawn = nullptr;
+
+	UPROPERTY()
+		ASpaceEggCharacter* LastSeenPlayer = nullptr;
+
 public:	
+	UFUNCTION(BlueprintCallable)
+		APawn* GetLastSeenPawn() const;
+	UFUNCTION(BlueprintCallable)
+		ASpaceEggCharacter* GetLastSeenCharacter() const;
+	UFUNCTION(BlueprintCallable)
+		bool CanSeeCharacter() const;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

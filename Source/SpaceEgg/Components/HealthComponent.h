@@ -31,6 +31,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Health")
 		float MaxHealth = 0;
+	
+	UFUNCTION()
+		void OnOwnerDestroyed(AActor* owner);
 
 public:	
 	virtual void TakeDamage(const FHitResult& hitResult, AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigateBy, AActor* DamageCauser);
