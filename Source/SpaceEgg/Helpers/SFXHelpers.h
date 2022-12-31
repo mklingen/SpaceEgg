@@ -8,14 +8,10 @@ class USoundCue;
 class UNiagaraSystem;
 class USoundAttenuation;
 
-UCLASS()
-class SPACEEGG_API USFXHelpers : public UObject
+USTRUCT(Blueprintable)
+struct SPACEEGG_API FSFXHelpers
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this empty's properties
-	USFXHelpers();
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "SFX")
@@ -27,7 +23,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "SFX")
 		USoundAttenuation* AudioAttenuation = nullptr;
 
-	bool PlayAudio(const FVector& pos, float volume = 1.0f, float pitch = 1.0f) const;
-	bool MakeParticles(const FVector& pos, const FRotator& rot = FRotator::ZeroRotator, const FVector& scale = FVector::OneVector) const;
-	bool Play(const FVector& pos, const FRotator& rot = FRotator::ZeroRotator, const FVector& scale = FVector::OneVector, float volume = 1.0f, float pitch = 1.0f) const;
+	bool PlayAudio(UObject* owner, const FVector& pos, float volume = 1.0f, float pitch = 1.0f) const;
+	bool MakeParticles(UObject* owner, const FVector& pos, const FRotator& rot = FRotator::ZeroRotator, const FVector& scale = FVector::OneVector) const;
+	bool Play(UObject* owner, const FVector& pos, const FRotator& rot = FRotator::ZeroRotator, const FVector& scale = FVector::OneVector, float volume = 1.0f, float pitch = 1.0f) const;
 };

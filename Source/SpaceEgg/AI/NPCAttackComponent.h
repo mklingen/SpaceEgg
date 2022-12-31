@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "SpaceEgg/Helpers/SFXHelpers.h"
 #include "NPCAttackComponent.generated.h"
 
 class ASpaceEggProjectile;
@@ -37,14 +38,15 @@ struct FAttack
 	UPROPERTY(EditDefaultsOnly, Category = Attack)
 		float MeleeDamage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
-		UAnimMontage* AttackAnimation;
-
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		float ProjectileArcSpeed = 0.0f;
 
 	UPROPERTY()
 		float LastAttackTime = -1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = SFX)
+		FSFXHelpers Effects;
+
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

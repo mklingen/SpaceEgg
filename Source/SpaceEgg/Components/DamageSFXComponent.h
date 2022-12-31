@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "SpaceEgg/Interfaces/DamageCallback.h"
+#include "SpaceEgg/Helpers/SFXHelpers.h"
 #include "DamageSFXComponent.generated.h"
 
-class USFXHelpers;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEEGG_API UDamageSFXComponent : public UActorComponent, public IDamageCallback
@@ -17,8 +17,10 @@ class SPACEEGG_API UDamageSFXComponent : public UActorComponent, public IDamageC
 public:	
 	// Sets default values for this component's properties
 	UDamageSFXComponent();
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Instanced, Category = "SFX")
-		USFXHelpers* Effects = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SFX")
+		FSFXHelpers Effects;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

@@ -104,6 +104,7 @@ bool UNPCAttackComponent::DoAttack(const FString& attackName, AActor* other)
 			hit.Location = GetOwner()->GetActorLocation();
 			hit.Normal = (other->GetActorLocation() - hit.Location).GetSafeNormal();
 			health->TakeDamage(hit, other, attack.MeleeDamage, nullptr, nullptr, GetOwner());
+			attack.Effects.Play(this, hit.Location, GetOwner()->GetActorRotation());
 		}
 
 		if (attack.ProjectileClass)
@@ -127,6 +128,7 @@ bool UNPCAttackComponent::DoAttack(const FString& attackName, AActor* other)
 				vel += FVector::UpVector * attack.ProjectileArcSpeed;
 				projectile->GetProjectileMovement()->Velocity = vel;
 			}
+			attack.Effects.Play(this, SpawnLocation, SpawnRotation);
 		}
 
 	}

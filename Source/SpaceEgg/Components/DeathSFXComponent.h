@@ -5,12 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "SpaceEgg/Interfaces/DeathCallback.h"
+#include "SpaceEgg/Helpers/SFXHelpers.h"
 #include "DeathSFXComponent.generated.h"
-
-class USoundCue; 
-class UNiagaraSystem;
-class USoundAttenuation;
-class USFXHelpers;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEEGG_API UDeathSFXComponent : public UActorComponent, public IDeathCallback
@@ -21,8 +17,8 @@ public:
 	// Sets default values for this component's properties
 	UDeathSFXComponent();
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Instanced, Category = "SFX")
-		USFXHelpers* Effects = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SFX")
+		FSFXHelpers Effects;
 
 protected:
 	// Called when the game starts
