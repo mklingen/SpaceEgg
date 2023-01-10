@@ -19,3 +19,5 @@ DrawDebugString(GetWorld(), drawPos, *FString::Printf(TEXT(text), ##__VA_ARGS__)
 #if UE_BUILD_SHIPPING
 #define DRAW_STRING(fmt, drawPos, drawColor, ...);
 #endif
+
+void DebugDrawPose(UWorld* world, const FTransform& pose, const float size = 100);
